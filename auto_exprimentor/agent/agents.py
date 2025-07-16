@@ -9,6 +9,8 @@ from typing import Callable
 
 
 DEFAULT_MODEL = "glm-4-flash-250414"
+model = "llama3.1:8b-instruct-q8_0"
+
 ExecCallbackType = Callable[[str, bool], ExecutionResult]
 
 
@@ -67,7 +69,7 @@ class Agent:
         plan, code = self.plan_and_code_query(
             system_message=system_message,
             user_message=user_message,
-            model="llama3.1:8b-instruct-q8_0",
+            model=model,
         )
         return Node(plan=plan, code=code)
 
@@ -87,7 +89,7 @@ class Agent:
         plan, code = self.plan_and_code_query(
             system_message=system_message,
             user_message=user_message,
-            model="llama3.1:8b-instruct-q8_0",
+            model=model,
         )
         return Node(plan=plan, code=code, parent=parent)
 
@@ -110,7 +112,7 @@ class Agent:
         plan, code = self.plan_and_code_query(
             system_message=system_message,
             user_message=user_message,
-            model="llama3.1:8b-instruct-q8_0",
+            model=model,
         )
         return Node(plan=plan, code=code, parent=parent)
 
@@ -160,7 +162,7 @@ class Agent:
         self.parse_exec_result(
             node=next_node,
             exec_result=exec_callback(next_node.code, True),
-            model="llama3.1:8b-instruct-q8_0",
+            model=model,
         )
 
         # update the journal

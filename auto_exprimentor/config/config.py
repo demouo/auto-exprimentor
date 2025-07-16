@@ -1,3 +1,4 @@
+import datetime
 from typing import Dict
 from pathlib import Path
 import time
@@ -8,7 +9,7 @@ config = {
     # experiment configurations
     "exp_name": "ML2025_HW2",
     "data_dir": Path("data/ML2025Spring-hw2-public").resolve(),
-    "code_save_dir": Path(f"data/codes/{time.time()}").resolve(),
+    "code_save_dir": Path(f"data/codes/{datetime.datetime.now()}").resolve(),
     # the description of the task
     "task_goal": "Given the survey results from the past two days in a specific state in the U.S.,\
                   predict the probability of testing positive on day 3. \

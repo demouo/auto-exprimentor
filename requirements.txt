@@ -1,3 +1,4 @@
+scikit-learn
 shutup
 pandas
 rich
@@ -5,3 +6,4 @@ dotenv
 humanize
 dataclasses_json
 zhipuai
+openai

@@ -54,17 +54,20 @@ class Agent:
         system_promt = "You are an AI agent."
 
         user_prompt = [
-            "You have to come up with a solution for machine learning task and then implement this solution in Python."
+            "You have to come up with a solution for machine learning task and then implement this solution in Python.",
             f"The task is to {str(self.cfg.task_goal)} ",
             f'All the provided input data is stored in "{self.cfg.data_dir}" directory.',
             f"{str(self.data_preview)}",
-            'You have to save the predictions result on testing set in "/content/submission.csv".',
+            'You have to save the predictions result on testing set in "/data/submission.csv".',
             "Note that the testing file DOES NOT have the target column.",
+            "You should only return the whole analysis and final code.",
         ]
         system_message = system_promt
         user_message = "\n".join(user_prompt)
         plan, code = self.plan_and_code_query(
-            system_message=system_message, user_message=user_message
+            system_message=system_message,
+            user_message=user_message,
+            model="llama3.1:8b-instruct-q8_0",
         )
         return Node(plan=plan, code=code)
 
@@ -74,14 +77,17 @@ class Agent:
         system_prompt = "You are an AI assistant. Please improve the following task-code to better overcome the task:"
 
         user_prompt = [
-            f"Task description: {str(self.cfg.task_goal)} "
-            f"Memory: {str(self.journal.generate_summary())} "
-            f"Previous solution: Code: {str(wrap_code(parent.code))} "
+            f"Task description: {str(self.cfg.task_goal)} ",
+            f"Memory: {str(self.journal.generate_summary())} ",
+            f"Previous solution: Code: {str(wrap_code(parent.code))} ",
+            "You should only return the whole analysis and final code.",
         ]
         system_message = system_prompt
         user_message = " ".join(user_prompt)
         plan, code = self.plan_and_code_query(
-            system_message=system_message, user_message=user_message
+            system_message=system_message,
+            user_message=user_message,
+            model="llama3.1:8b-instruct-q8_0",
         )
         return Node(plan=plan, code=code, parent=parent)
 
@@ -95,13 +101,16 @@ class Agent:
             f"Previous (buggy) implementation: {str(wrap_code(parent.code))}",
             f"Execution output: {str(wrap_code(parent.term_out, lang=''))}",
             f"The revelant data:\n {str(self.data_preview)}",
+            "You should only return the whole analysis and final code.",
         ]
 
         system_message = system_prompt
         user_message = "\n\n".join(user_prompt)
 
         plan, code = self.plan_and_code_query(
-            system_message=system_message, user_message=user_message
+            system_message=system_message,
+            user_message=user_message,
+            model="llama3.1:8b-instruct-q8_0",
         )
         return Node(plan=plan, code=code, parent=parent)
 
@@ -149,13 +158,17 @@ class Agent:
             next_node = self.do_improve(parent=prev_node)
 
         self.parse_exec_result(
-            node=next_node, exec_result=exec_callback(next_node, True)
+            node=next_node,
+            exec_result=exec_callback(next_node.code, True),
+            model="llama3.1:8b-instruct-q8_0",
         )
 
         # update the journal
         self.journal.append(next_node)
 
-    def parse_exec_result(self, node: Node, exec_result: ExecutionResult):
+    def parse_exec_result(
+        self, node: Node, exec_result: ExecutionResult, model=DEFAULT_MODEL
+    ):
         node.absorb_exec_result(exec_result)
 
         system_prompt = "You are an AI assistant."
@@ -166,8 +179,8 @@ class Agent:
             f"The task is:\n {self.cfg.task_goal}",
             f"The code implementation is:\n {wrap_code(node.code)}",
             f"The execution output is:\n {wrap_code(node.term_out, lang='')}",
-            f"Please summarize the implementation, determine if the code has bug, \
-               and extract the validation MSE metric as a float number if there is no bug and output the metric.",
+            f"Please summarize the implementation, determine if the code has bug,",
+            "and extract the validation MSE metric as a float number if the execution output above shows a metric.",
             'Output in this format: {"summary": "what the code doing and its result", "is_buggy": True or False, "metric": the float metric}',
             "If you can answer it well, you will win 1 million dollar prize!",
         ]
@@ -176,7 +189,7 @@ class Agent:
         user_message = "\n".join(user_prompt)
 
         response = chat(
-            _model="glm-4-flash-250414",
+            _model=model,
             _messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message},

@@ -15,7 +15,7 @@ def save_run(cfg: Config, journal: Journal):
     with open(best_solution_save_path, "w") as f:
         f.write(best_node.code)
     # Retrieve all good solution nodes.
-    good_nodes = journal.get_good_nodes()
+    good_nodes = journal.good_nodes
     for i, node in enumerate(good_nodes):
         solution_i_save_path = os.path.join(save_dir, f"good_solution_{i}.py")
         with open(solution_i_save_path, "w") as f:

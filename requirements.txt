@@ -1,0 +1,5 @@
+shutup
+pandas
+rich
+dotenv
+humanize

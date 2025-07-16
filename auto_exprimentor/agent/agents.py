@@ -30,7 +30,7 @@ class Agent:
             response = chat(
                 _model=model,
                 _messages=[
-                    {"role": "systemt", "content": system_message},
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": user_message},
                 ],
             )
@@ -165,11 +165,11 @@ class Agent:
         user_prompt = [
             f"The task is:\n {self.cfg.task_goal}",
             f"The code implementation is:\n {wrap_code(node.code)}",
-            f"The execution output is:\n {wrap_code(node.term_out, lang="")}",
+            f"The execution output is:\n {wrap_code(node.term_out, lang='')}",
             f"Please summarize the implementation, determine if the code has bug, \
                and extract the validation MSE metric as a float number if there is no bug and output the metric.",
             'Output in this format: {"summary": "what the code doing and its result", "is_buggy": True or False, "metric": the float metric}',
-            'If you can answer it well, you will win 1 million dollar prize!'
+            "If you can answer it well, you will win 1 million dollar prize!",
         ]
 
         system_message = system_prompt
@@ -198,7 +198,11 @@ class Agent:
             # right extract
             response = response[0]
             node.analysis = response.get("summary", "The result is null")
-            node.is_buggy = node.exc_type or response.get("is_buggy", True) or response.get("metric", None) is None
+            node.is_buggy = (
+                node.exc_type
+                or response.get("is_buggy", True)
+                or response.get("metric", None) is None
+            )
             node.metric = response.get("metric", MAX_METRIC)
         else:
             node.is_buggy = True

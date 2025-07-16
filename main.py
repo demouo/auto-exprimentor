@@ -1,11 +1,15 @@
-from config.config import cfg
-from agent.agents import Agent
-from journal.journals import Journal
-from tools.interpreter import Interpreter
-from journal.saver import save_run
+from auto_exprimentor.config.config import cfg
+from auto_exprimentor.agent.agents import Agent
+from auto_exprimentor.journal.journals import Journal
+from auto_exprimentor.tools.interpreter import Interpreter
+from auto_exprimentor.journal.saver import save_run
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 
 def main():
+
     def exec_callback(*args, **kwargs):
         res = interpreter.run(*args, **kwargs)
         return res

@@ -3,6 +3,7 @@
 import os
 from typing import Callable
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
 
@@ -51,6 +52,9 @@ chat_factory = ChatFactory()
 
 
 def chat(_model: str = "glm-4-flash-250414", _messages: list[dict] = []) -> str:
+    logging.info(f"human: {_messages}")
     chat_factory.register_model(_model)
     response = chat_factory(_model=_model, _messages=_messages)
-    return response.choices[0].message.content
+    ai_content = response.choices[0].message.content
+    logging.info(f"ai({_model}): {ai_content}")
+    return ai_content

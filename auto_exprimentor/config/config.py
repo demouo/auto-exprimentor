@@ -1,21 +1,7 @@
 from typing import Dict
-
-
-class Config:
-    """
-    A recursive configuration class that converts a dict into an object
-    with attribute accessible using dot notation.
-    """
-
-    def __init__(self, dict_cfg: Dict):
-        for k, v in dict_cfg.items():
-            if isinstance(v, dict):
-                v = Config(v)
-            setattr(self, k, v)
-
-
 from pathlib import Path
 import time
+
 
 # ================  TODO: config ================
 config = {
@@ -38,5 +24,28 @@ config = {
         },
     },
 }
+
+
+def set_random(seed=42):
+    import random
+
+    random.seed(seed)
+
+
+set_random()
+
+
+class Config:
+    """
+    A recursive configuration class that converts a dict into an object
+    with attribute accessible using dot notation.
+    """
+
+    def __init__(self, dict_cfg: Dict):
+        for k, v in dict_cfg.items():
+            if isinstance(v, dict):
+                v = Config(v)
+            setattr(self, k, v)
+
 
 cfg = Config(config)
